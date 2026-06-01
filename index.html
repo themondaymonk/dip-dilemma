@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" data-skin="warm" data-mode="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
+<title>DIP Dilemma</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DIP Dilemma">
+<meta name="theme-color" content="#16130f">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,900;1,9..144,400&family=Newsreader:ital,opsz@0,6..72;1,6..72&family=Sora:wght@400;500;600;700&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== WARM skin (default) ===== */
+:root[data-skin="warm"][data-mode="dark"]{
+  --bg:#16130f; --surf:#1f1b15; --surf2:#28231b; --surf3:#322b20;
+  --tx:#f4ede0; --tx-dim:#b8ad9a; --tx-faint:#7d735f;
+  --line:#393227; --line2:#473d2f;
+  --acc:#d9a441; --u:#d9a441; --w:#5fb3a3; --h:#b58cd6; --warn:#c97b54;
+  --shadow:0 8px 30px rgba(0,0,0,.5);
+  --radius:13px;
+}
+:root[data-skin="warm"][data-mode="light"]{
+  --bg:#f2e9d8; --surf:#fbf5e9; --surf2:#f3ead6; --surf3:#ebe0c8;
+  --tx:#3a2f1f; --tx-dim:#7a6b54; --tx-faint:#a8987c;
+  --line:#e2d5bb; --line2:#d4c4a3;
+  --acc:#b07d22; --u:#b07d22; --w:#3d8a7c; --h:#8259ab; --warn:#bc5f31;
+  --shadow:0 6px 24px rgba(120,90,40,.14);
+  --radius:13px;
+}
+/* ===== COOL skin (the distant alternate) ===== */
+:root[data-skin="cool"][data-mode="dark"]{
+  --bg:#0d0f14; --surf:#161a22; --surf2:#1d2330; --surf3:#252c3b;
+  --tx:#eef1f6; --tx-dim:#9aa3b4; --tx-faint:#646d7e;
+  --line:#222936; --line2:#2e3645;
+  --acc:#e0a43d; --u:#e0a43d; --w:#5fb3a3; --h:#b58cd6; --warn:#d68a5c;
+  --shadow:0 8px 30px rgba(0,0,0,.5);
+  --radius:14px;
+}
+:root[data-skin="cool"][data-mode="light"]{
+  --bg:#f4f2ee; --surf:#ffffff; --surf2:#faf8f4; --surf3:#f0ede7;
+  --tx:#1a1d24; --tx-dim:#5c6470; --tx-faint:#9aa0aa;
+  --line:#e4e0d8; --line2:#d6d1c7;
+  --acc:#b87e1f; --u:#b87e1f; --w:#3d8a7c; --h:#8259ab; --warn:#c26a3a;
+  --shadow:0 6px 24px rgba(60,50,30,.10);
+  --radius:14px;
+}
+/* fonts switch with skin */
+:root[data-skin="warm"]{--font-display:'Fraunces',Georgia,serif;--font-body:'Newsreader',Georgia,serif;--disp-weight:500;}
+:root[data-skin="cool"]{--font-display:'Sora',sans-serif;--font-body:'Archivo',sans-serif;--disp-weight:600;}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font-family:var(--font-body);font-size:17px;line-height:1.5;overflow:hidden;transition:background .35s,color .35s}
+:root[data-skin="warm"] body{
+  background-image:radial-gradient(ellipse 120% 80% at 50% -10%, color-mix(in srgb,var(--acc) 12%,transparent), transparent 60%),radial-gradient(ellipse 90% 60% at 90% 110%, color-mix(in srgb,var(--w) 7%,transparent), transparent 55%);
+}
+.app{display:flex;flex-direction:column;height:100%;max-width:720px;margin:0 auto;position:relative}
+
+.np{flex:0 0 auto;padding:calc(env(safe-area-inset-top) + 16px) 20px 16px;background:var(--surf);border-bottom:1px solid var(--line);position:relative;z-index:10;transition:background .35s}
+:root[data-skin="warm"] .np{background:linear-gradient(180deg,var(--surf2),color-mix(in srgb,var(--surf) 60%,transparent))}
+.np.empty{background:transparent;border-bottom:none;padding-bottom:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.brand{font-family:var(--font-display);font-weight:600;font-size:16px;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.brand .mk{width:19px;height:19px;border:2px solid var(--acc);border-radius:5px;transform:rotate(45deg);position:relative}
+.brand .mk::after{content:"";position:absolute;inset:3px;background:var(--acc);border-radius:1px;opacity:.5}
+.modebtn{background:var(--surf2);border:1px solid var(--line2);color:var(--tx-dim);width:34px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
+.modebtn:hover{color:var(--acc);border-color:var(--acc)}
+.np-kicker{font-family:var(--font-display);font-weight:600;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);margin-bottom:8px;display:flex;justify-content:space-between;gap:10px}
+.np-kicker .prog{color:var(--tx-faint);letter-spacing:.07em}
+.np-title{font-family:var(--font-display);font-weight:var(--disp-weight);font-size:23px;line-height:1.18;letter-spacing:-.015em}
+.np-title .e{color:var(--acc);font-weight:600}
+.np-row{margin-top:9px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13.5px;color:var(--tx-dim)}
+.pill{font-family:var(--font-display);font-weight:600;font-size:11px;letter-spacing:.03em;padding:3px 10px;border-radius:99px;display:inline-flex;align-items:center;gap:5px}
+.pill.u{color:var(--u);background:color-mix(in srgb,var(--u) 15%,transparent)}
+.pill.w{color:var(--w);background:color-mix(in srgb,var(--w) 15%,transparent)}
+.pill.h{color:var(--h);background:color-mix(in srgb,var(--h) 17%,transparent)}
+.pill .star{font-size:9px}
+.np-topic{color:var(--tx-dim)}
+.iwarn{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;border:1px solid var(--line2);color:var(--tx-faint);font-size:11px;font-style:italic;font-family:var(--font-display);cursor:pointer}
+.iwarn:hover{color:var(--warn);border-color:var(--warn)}
+.np-summary{margin-top:12px;font-size:15.5px;line-height:1.5;color:var(--tx-dim)}
+:root[data-skin="warm"] .np-summary{font-style:italic;color:var(--tx-dim)}
+.np-warnbox{margin-top:10px;font-size:13.5px;line-height:1.45;color:var(--warn);background:color-mix(in srgb,var(--warn) 11%,transparent);border-radius:10px;padding:9px 13px;display:none}
+.np-warnbox.on{display:block}
+
+.controls{flex:0 0 auto;padding:14px 20px 12px;background:var(--surf);border-bottom:1px solid var(--line);transition:background .35s}
+:root[data-skin="warm"] .controls{background:linear-gradient(180deg,color-mix(in srgb,var(--surf) 60%,transparent),var(--surf))}
+.scrub{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.time{font-family:var(--font-display);font-size:12px;color:var(--tx-faint);font-variant-numeric:tabular-nums;min-width:40px;font-weight:500}
+.time.r{text-align:right}
+.bar{flex:1;height:6px;background:var(--surf3);border-radius:99px;position:relative;cursor:pointer;touch-action:none}
+.bar-fill{position:absolute;inset:0;width:0;background:linear-gradient(90deg,color-mix(in srgb,var(--acc) 70%,#000 0%),var(--acc));border-radius:99px}
+.bar-knob{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--tx);box-shadow:0 1px 5px rgba(0,0,0,.4);transform:translate(-50%,-50%);left:0}
+.btns{display:flex;align-items:center;justify-content:center;gap:5px}
+.btn{background:none;border:none;color:var(--tx);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .15s,transform .1s;position:relative}
+.btn:active{transform:scale(.91)}
+.btn.sm{width:48px;height:48px}.btn.sm:hover{background:var(--surf2)}
+.btn.play{width:62px;height:62px;background:linear-gradient(145deg,var(--acc),color-mix(in srgb,var(--acc) 75%,#000));color:var(--bg);box-shadow:0 6px 18px color-mix(in srgb,var(--acc) 32%,transparent)}
+.btn .lbl{position:absolute;font-size:8.5px;bottom:3px;font-family:var(--font-display);font-weight:600;color:var(--tx-faint)}
+.rate-val{font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--tx-dim);border:1px solid var(--line2);border-radius:99px;padding:7px 10px;min-width:46px;text-align:center}
+.rate-val:hover{border-color:var(--acc);color:var(--acc)}
+.subrow{display:flex;justify-content:center;gap:8px;margin-top:11px}
+.chip{font-family:var(--font-display);font-size:11.5px;font-weight:600;letter-spacing:.02em;color:var(--tx-faint);border:1px solid var(--line2);border-radius:99px;padding:6px 14px;cursor:pointer;background:none}
+.chip:hover{color:var(--acc);border-color:var(--acc)}
+.chip.on{color:var(--bg);background:var(--w);border-color:var(--w)}
+
+.list-wrap{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding:0 12px calc(env(safe-area-inset-bottom) + 30px);-webkit-overflow-scrolling:touch}
+.list-wrap::-webkit-scrollbar{width:6px}.list-wrap::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px}
+
+.intro{padding:28px 20px 10px;text-align:center}
+.intro .logo{width:50px;height:50px;border:3px solid var(--acc);border-radius:14px;transform:rotate(45deg);margin:0 auto 20px;position:relative}
+.intro .logo::after{content:"";position:absolute;inset:8px;background:var(--acc);border-radius:3px;opacity:.55}
+.intro h1{font-family:var(--font-display);font-weight:900;font-size:32px;letter-spacing:-.02em}
+.intro .tag{font-size:15px;color:var(--tx-dim);margin-top:6px}
+:root[data-skin="warm"] .intro .tag{font-style:italic}
+.intro p{font-size:15px;color:var(--tx-dim);margin:14px auto 0;max-width:480px;line-height:1.55}
+.stats{margin-top:18px;display:flex;justify-content:center;gap:10px}
+.stat{background:var(--surf);border:1px solid var(--line);border-radius:var(--radius);padding:11px 17px;min-width:74px}
+.stat b{font-family:var(--font-display);font-weight:700;font-size:21px;color:var(--acc);display:block}
+.stat span{font-size:10.5px;color:var(--tx-faint);letter-spacing:.05em}
+.cta{margin-top:20px;display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.start{font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--bg);background:linear-gradient(145deg,var(--acc),color-mix(in srgb,var(--acc) 75%,#000));border:none;border-radius:var(--radius);padding:13px 26px;cursor:pointer;box-shadow:0 6px 18px color-mix(in srgb,var(--acc) 30%,transparent)}
+.start.alt{background:none;color:var(--w);border:1px solid color-mix(in srgb,var(--w) 45%,transparent);box-shadow:none}
+.start:active{transform:scale(.97)}
+.reset{margin-top:13px;background:none;border:none;color:var(--tx-faint);font-size:12.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-family:var(--font-body)}
+.reset:hover{color:var(--warn)}
+
+.section-tab{display:flex;gap:6px;margin:24px 4px 4px;background:var(--surf);border:1px solid var(--line);border-radius:var(--radius);padding:4px}
+.section-tab button{flex:1;font-family:var(--font-display);font-weight:600;font-size:13.5px;color:var(--tx-dim);background:none;border:none;border-radius:9px;padding:11px;cursor:pointer;transition:.2s}
+.section-tab button.on{background:var(--acc);color:var(--bg)}
+
+.tier{margin-top:15px}
+.tier-head{padding:9px 8px 6px;position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg) 76%,transparent)}
+.tier-name{font-family:var(--font-display);font-weight:600;font-size:16px;letter-spacing:-.005em;display:flex;align-items:center;gap:9px;color:var(--acc)}
+.tier-name .n{font-size:11px;color:var(--tx-faint);font-weight:600;background:var(--surf2);border-radius:6px;padding:2px 7px;font-family:var(--font-display)}
+.tier-desc{font-size:13px;color:var(--tx-faint);margin-top:2px;padding-left:1px}
+:root[data-skin="warm"] .tier-desc{font-style:italic}
+.ep{display:flex;align-items:flex-start;gap:12px;padding:13px 12px;border-radius:var(--radius);cursor:pointer;transition:background .14s;position:relative;border:1px solid transparent}
+.ep:hover{background:var(--surf)}
+.ep.active{background:var(--surf);border-color:color-mix(in srgb,var(--acc) 38%,transparent)}
+.ep.done .ep-num,.ep.done .ep-title{opacity:.4}
+.ep-num{font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--acc);min-width:33px;padding-top:2px;font-variant-numeric:tabular-nums}
+.ep-body{flex:1;min-width:0}
+.ep-title{font-family:var(--font-display);font-weight:var(--disp-weight);font-size:16px;line-height:1.25;letter-spacing:-.005em}
+.ep-sub{font-size:12.5px;color:var(--tx-faint);margin-top:3px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.ep-acc{font-weight:600}
+.ep-acc.u{color:var(--u)}.ep-acc.w{color:var(--w)}.ep-acc.h{color:var(--h)}
+.ep-state{flex:0 0 auto;padding-top:2px;display:flex;align-items:center;gap:8px}
+.ep-del{color:var(--tx-faint);font-size:19px;line-height:1;padding:0 3px}
+.ep-del:hover{color:var(--warn)}
+.eq{display:flex;gap:2px;align-items:flex-end;height:14px}
+.eq span{width:2.5px;background:var(--acc);border-radius:2px;animation:eq 1s infinite ease-in-out}
+.eq span:nth-child(2){height:13px;animation-delay:.2s}.eq span:nth-child(1){height:6px}.eq span:nth-child(3){height:8px;animation-delay:.4s}
+.eq.paused span{animation-play-state:paused}
+@keyframes eq{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+.check{color:var(--tx-faint)}
+
+.addbox{margin:14px 6px 0;padding:16px;background:var(--surf);border:1px solid var(--line);border-radius:var(--radius)}
+.addbox h3{font-family:var(--font-display);font-weight:600;font-size:14px;color:var(--tx)}
+.addbox p{font-size:13px;color:var(--tx-faint);line-height:1.5;margin:6px 0 12px}
+.addrow{display:flex;gap:7px;margin-bottom:7px}
+.addrow input{flex:1;min-width:0;background:var(--surf2);border:1px solid var(--line2);border-radius:10px;padding:11px 12px;color:var(--tx);font-family:var(--font-body);font-size:15px}
+.addrow input:focus{outline:none;border-color:var(--acc)}
+.addrow input.num{flex:0 0 78px}
+.addrow button{font-family:var(--font-display);font-weight:600;font-size:14px;color:var(--bg);background:var(--w);border:none;border-radius:10px;padding:11px 17px;cursor:pointer}
+.addrow button:active{transform:scale(.96)}
+.empty-lib{text-align:center;padding:30px 20px;color:var(--tx-faint);font-size:14px;line-height:1.6}
+:root[data-skin="warm"] .empty-lib{font-style:italic}
+
+.tools{margin:16px 6px 0;padding:15px 17px;background:var(--surf);border:1px solid var(--line);border-radius:var(--radius)}
+.tools h3{font-family:var(--font-display);font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc);margin-bottom:9px}
+.tools a{color:var(--w);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--w) 35%,transparent)}
+.tools p{font-size:13.5px;color:var(--tx-dim);line-height:1.55;margin-top:7px}
+.tools .warn{color:var(--warn)}
+.appearance{margin:22px 6px 8px;text-align:center}
+.appearance button{background:none;border:none;color:var(--tx-faint);font-size:11.5px;font-family:var(--font-body);cursor:pointer;opacity:.55;letter-spacing:.02em}
+.appearance button:hover{opacity:1;color:var(--acc)}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 22px);transform:translateX(-50%) translateY(20px);background:var(--surf3);border:1px solid var(--line2);color:var(--tx);font-size:14px;padding:11px 20px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:50;box-shadow:var(--shadow)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+audio{display:none}
+</style>
+</head>
+<body>
+<div class="app"><div id="npShell"></div><div class="list-wrap" id="listWrap"></div></div>
+<audio id="audio" preload="metadata"></audio>
+<div class="toast" id="toast"></div>
+<script>
+const DATA={"tiers":{"1":{"name":"Core Foundation","desc":"The algorithmic mindset. Start here."},"2":{"name":"CLEAN-SP — Ethics, Safety & Systems","desc":"The 'free points' most people miss."},"3":{"name":"Biostatistics","desc":"Concept over formula. Where scores separate."},"4":{"name":"Pharm, Micro & Electrolytes","desc":"Empiric therapy and rapid-fire rules."},"5":{"name":"Clutch System Reviews","desc":"Dense single-topic masterclasses."},"6":{"name":"Hidden Gems","desc":"The high-percentile edge."},"7":{"name":"Test Mechanics & Psychology","desc":"How you take it, not just what you know."},"8":{"name":"Final Week","desc":"Calibration to the live test."}},"acclaim":{"U":{"label":"Universally cited","tone":"u"},"W":{"label":"Widely recommended","tone":"w"},"H":{"label":"Hidden gem","tone":"h"}},"episodes":[{"ep":37,"title":"Risk Factors, Preventive Medicine & Screening","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2018/06/divine-intervention-episode-37-risk-factors-preventive-medicine-and-hy-screening-guidelines.mp3","year":2018,"tier":1,"topic":"Epidemiology","acclaim":"U","summary":"Runs through the most important risk factors for commonly-tested NBME diseases across IM, surgery and OB/GYN, plus high-yield screening and the 'most common causes of death.' Teaches the crucial split between 'most common' and 'greatest' risk factor.","why":"The single most-recommended episode in the whole series. A genuine must-listen-twice.","old":true},{"ep":97,"title":"The “Most Important” Podcast","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2019/04/episode-97-most-important-.mp3","year":2019,"tier":1,"topic":"Epidemiology","acclaim":"U","summary":"Sequel to Ep 37, pivoting to the NBME's love of 'most important prognostic factor, complication, predictor of survival.' Ends on malignancies linked to infectious agents.","why":"Bridges the gap for people who crush UWorld but dip on NBME prognosis questions.","old":true},{"ep":184,"title":"The NBME Weird","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2019/11/episode-184-nbme-weird_2.mp3","year":2019,"tier":1,"topic":"Epidemiology","acclaim":"U","summary":"A direct extension of 37/97 into the odd, low-frequency complications, prognostic factors and causes of death that blindside people. The questions that look foreign but are testing a secondary complication of something familiar.","why":"Frequently named the key to the bizarre, seemingly-unanswerable questions.","old":true},{"ep":137,"title":"Next Best Step in Management 1","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2019/08/episode-137-nbsim-series-1.mp3","year":2019,"tier":1,"topic":"Strategy","acclaim":"U","summary":"Opens the management-algorithm series: when to image, when to treat, when to observe — across the full span of Step 2 CK disciplines.","why":"Reprograms how you read the final sentence of a vignette.","old":true},{"ep":325,"title":"Extremely HY Screening Guidelines","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2021/07/episode-325-screening-guidelines.mp3","year":2021,"tier":1,"topic":"Preventive Med","acclaim":"U","summary":"A categorized sweep of current USPSTF screening, built to make the rules stick. Covers the cancers, AAA, and the special-case thresholds primary-care vignettes hinge on.","why":"Updates the screening ages textbooks get wrong. Note the creator's own errata: colon now 45, lung 20 pack-yr from age 50.","old":true},{"ep":123,"title":"USMLE Ethics Series 1","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2019/07/episode-123-usmle-ethics-1.mp3","year":2019,"tier":2,"topic":"Ethics","acclaim":"U","summary":"The foundational ethics primer — autonomy, beneficence, non-maleficence, justice — taught as classic NBME presentations with the specific 'what to do' for each permutation.","why":"Cited alongside UWorld as a primary ethics resource. Free points if you know it.","old":true},{"ep":228,"title":"Nov 2020 Series 1: Palliative Care 1","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/04/episode-228-clean-sp-1.mp3","year":2020,"tier":2,"topic":"CLEAN-SP","acclaim":"U","summary":"Launches the CLEAN-SP curriculum built for the 2020 exam overhaul. Focuses on palliative care, advance care planning, and the communication frameworks for hard conversations.","why":"The administrative/ethics content most schools never formally teach — and the NBME now tests heavily.","old":true},{"ep":230,"title":"Nov 2020 Series 2: Quality & Safety","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/04/episode-230-clean-sp-2.mp3","year":2020,"tier":2,"topic":"CLEAN-SP","acclaim":"U","summary":"The high-yield quality-and-safety vocabulary with copious examples — root cause analysis, the Swiss cheese model, systemic vs individual error.","why":"Defines the exact buzzwords the NBME hides answers behind.","old":true},{"ep":234,"title":"Nov 2020 Series 3: Medication/Transition Errors","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/05/episode-234-clean-sp-3.mp3","year":2020,"tier":2,"topic":"CLEAN-SP","acclaim":"W","summary":"Drills into where harm actually happens: patient hand-offs, transitions of care, discharge, and the classification of adverse drug events.","why":"Closes the 'silly mistake' gap on hospital-administration questions.","old":true},{"ep":268,"title":"Nov 2020 Series 4: Palliative Care 2","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/10/episode-268-clean-sp-4-palliative-.mp3","year":2020,"tier":2,"topic":"CLEAN-SP","acclaim":"W","summary":"Continues palliative care into end-of-life pharmacology and the thornier family-dynamics and advance-directive conflicts.","why":"The perfect complement to Ep 228 for ambiguous terminal-patient scenarios.","old":true},{"ep":275,"title":"Nov 2020 Series 5: Diagnostic Errors","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/12/episode-275-nov-2020-series-5.mp3","year":2020,"tier":2,"topic":"CLEAN-SP","acclaim":"W","summary":"Turns abstract cognitive bias into concrete vignettes — anchoring, premature closure, availability — and how each leads to a wrong diagnosis.","why":"Built for the modern exam's focus on physician meta-cognition.","old":true},{"ep":276,"title":"Nov 2020 Series 6: Professionalism/Ethics","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/12/episode-276-nov-2020-series-6.mp3","year":2020,"tier":2,"topic":"CLEAN-SP","acclaim":"W","summary":"A truckload of professionalism/ethics scenarios, coaching the 'best physician response' to uncomfortable, ambiguous or legally fraught situations.","why":"An applied expansion of Ep 123 into the gray areas the NBME favors.","old":true},{"ep":277,"title":"Nov 2020 Series 7: Infection Prevention/Control","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/12/episode-277-nov-2020-series-7.mp3","year":2020,"tier":2,"topic":"CLEAN-SP","acclaim":"W","summary":"Clarifies the isolation precautions — airborne vs droplet vs contact — across a wide range of exam scenarios.","why":"Rote-protocol questions that are guaranteed points once memorized.","old":true},{"ep":143,"title":"The Clutch Biostats Review","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2019/08/episode-143-clutch-biostatistics-.mp3","year":2019,"tier":3,"topic":"Biostats","acclaim":"U","summary":"Works through the vast majority of testable biostats using ~200 questions, deliberately steering away from formula-memorization toward reasoning. Comes with slides to annotate.","why":"Widely treated as THE audio biostats resource for the USMLE.","old":true},{"ep":197,"title":"Bias in Biostatistics","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2019/12/episode-197-bias.mp3","year":2019,"tier":3,"topic":"Biostats","acclaim":"W","summary":"Reviews the high-yield biases that surface across all three Steps — selection, recall, measurement — and how to tell them apart in dense vignettes.","why":"An NBME-favorite topic worth getting down cold.","old":true},{"ep":363,"title":"Taking the Confusion Out of Confounding","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2022/01/episode-363-confounding-.mp3","year":2022,"tier":3,"topic":"Biostats","acclaim":"W","summary":"Isolates confounding with lots of examples, then shows exactly how it gets tested on NBME forms.","why":"Targets a concept people reliably guess on. Pair with Ep 364.","old":false},{"ep":364,"title":"Effect Modification","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2022/01/episode-364-effect-modification.mp3","year":2022,"tier":3,"topic":"Biostats","acclaim":"W","summary":"Explains effect modification and — critically — how it differs from confounding (control one, report the other).","why":"Mastering this distinction is required for the top-tier biostats questions. Pair with Ep 363.","old":false},{"ep":530,"title":"Cognitive Errors and the USMLEs","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2024/04/episode-530-cognitive-errors-and-the-usmles.mp3","year":2024,"tier":3,"topic":"Biostats / Safety","acclaim":"W","summary":"Introduces each cognitive error with an example, names the specific NBME 'hotspots' that test it, then gives memory hooks so you don't confuse them on test day.","why":"A newer episode that's risen fast as the exam leans into physician-error questions.","old":false},{"ep":41,"title":"USMLE Antibiotic Guide","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2018/07/divine-intervention-episode-41-usmle-antibiotic-guide.mp3","year":2018,"tier":4,"topic":"Pharm / Micro","acclaim":"W","summary":"A high-level heuristic for empiric antibiotic choice — effectively, 'when you see this bug/scenario, do this.'","why":"A long-time lifesaver for clinical ID management. Cross-check newer guideline specifics.","old":true},{"ep":460,"title":"Floridly HY Antibiotic Review 1","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2023/06/episode-460-qad-antibiotics-1.mp3","year":2023,"tier":4,"topic":"Pharm / Micro","acclaim":"W","summary":"A modern, integration-heavy rebuild of antibiotic selection, mechanism and side effects — part one of two.","why":"Recommended hard for anyone missing antibiotic-choice questions on UWorld.","old":false},{"ep":461,"title":"Floridly HY Antibiotic Review 2","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2023/06/episode-461-qad-antibiotics-2.mp3","year":2023,"tier":4,"topic":"Pharm / Micro","acclaim":"W","summary":"Part two, going deep on the other classically-tested antibiotics. The creator pleads with listeners to do both before the exam.","why":"Completes the empiric-therapy framework from Ep 460.","old":false},{"ep":250,"title":"The Ultra HY Vaccine Podcast","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/07/episode-250-vaccine-schedules.mp3","year":2020,"tier":4,"topic":"Preventive Med","acclaim":"U","summary":"Makes vaccine schedules learnable: real exam scenarios first, then digestible rules, then the special NBME populations (asplenic, HIV+, pregnant).","why":"Near-universally listed as mandatory pre-exam listening for guaranteed points.","old":true},{"ep":135,"title":"The “Clutch” Electrolyte Podcast","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2019/08/episode-135-clutch-electrolytes.mp3","year":2019,"tier":4,"topic":"Nephro / IM","acclaim":"W","summary":"Systematically works through every major electrolyte tested — Na, K, Ca, Mg and the minors — as applicable rules rather than scattered facts.","why":"A strong rescue for nuanced nephro/endo/critical-care vignettes.","old":true},{"ep":226,"title":"The USMLE and Iron Labs","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/03/episode-226-fe-labs.mp3","year":2020,"tier":5,"topic":"Heme","acclaim":"W","summary":"Deconstructs the ferritin / iron / TIBC shifts in anemia of chronic disease vs iron deficiency by mechanism, so you stop memorizing the table.","why":"Clears up enormous confusion; highly testable. See its 2024 update, Ep 552.","old":true},{"ep":552,"title":"The Iron Story Part 2","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2024/12/fe-story-2.mp3","year":2024,"tier":5,"topic":"Heme","acclaim":"W","summary":"The 2024 follow-up to Ep 226, wrapping the iron story through specific pathologies and integrating genetics, hematology, microbiology and endocrinology.","why":"Worth a listen for the refreshed, more-integrated take every exam-taker now sees.","old":false},{"ep":257,"title":"The Clutch Bilirubin Podcast","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/08/episode-257-clutch-bilirubin-.mp3","year":2020,"tier":5,"topic":"GI","acclaim":"W","summary":"Covers the great majority of bilirubin pathologies — direct vs indirect, Gilbert, Dubin-Johnson and friends — for Step 1–3.","why":"High prevalence; reliably nets multiple correct questions.","old":true},{"ep":208,"title":"Transfusion Reactions","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/02/episode-208-transfusion-reactions.mp3","year":2020,"tier":5,"topic":"Heme","acclaim":"W","summary":"Short and dense: pathophysiology, the minutes-vs-hours presentation timeline, and management of each transfusion reaction (TRALI, TACO, anaphylactic and more).","why":"On essentially every form; perfect for pairing with active recall.","old":true},{"ep":169,"title":"Clutch Nephrotic/Nephritic Syndrome","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2019/10/episode-169-glomerular-diseases.mp3","year":2019,"tier":5,"topic":"Nephro","acclaim":"H","summary":"Untangles the glomerular diseases by clinical presentation and microscopic findings — the visually-similar entities people mix up.","why":"Often cited as the best audio resource for demystifying glomerular disease.","old":true},{"ep":173,"title":"Clutch Immunodeficiency Diseases","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2019/10/episode-173-clutch-idd.mp3","year":2019,"tier":5,"topic":"Immuno","acclaim":"H","summary":"Essentially everything testable on the immunodeficiencies, distinguished by patient history and age of onset.","why":"Shows up constantly on 2CK/3; a strong hidden-gem rescue.","old":true},{"ep":36,"title":"USMLE Ophthalmology","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2018/06/divine-intervention-episode-36-usmle-ophthalmology.mp3","year":2018,"tier":5,"topic":"Special Systems","acclaim":"W","summary":"The great majority of ophthalmology tested across the medicine/peds/surgery/neuro shelves and 2CK/3 — ocular trauma, acute vision loss, red eye, systemic disease with eye findings.","why":"Turns a traditionally weak subject into a point-scoring strength.","old":true},{"ep":26,"title":"USMLE Radiology","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2018/05/divine-intervention-episode-26-usmle-radiology.mp3","year":2018,"tier":5,"topic":"Diagnostics","acclaim":"W","summary":"Cycles through the pathognomonic radiographic signs (thumbprint, steeple and the rest) via ~38 rapid clinical vignettes.","why":"Excellent for building an auditory mental model of imaging described in text.","old":true},{"ep":204,"title":"The USMLE and the Military","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/01/episode-204-usmle-military-.mp3","year":2020,"tier":6,"topic":"Special Pops","acclaim":"W","summary":"Covers the topics the NBME ties to service members — TBI, PTSD, military sexual trauma — plus downstream effects on families. Has slides.","why":"Addresses a real, persistent NBME bias toward VA-population vignettes.","old":true},{"ep":231,"title":"USMLE Military Podcast Part 2","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/04/episode-231-usmle-military-2.mp3","year":2020,"tier":6,"topic":"Micro / ID","acclaim":"H","summary":"The infectious-disease and vaccination half of the military series — deployment and returning-traveler exposures like malaria and leishmaniasis.","why":"Hidden-gem points on otherwise-impossible obscure micro questions.","old":true},{"ep":207,"title":"The USMLE and Geriatrics Part 1","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2020/01/episode-207-geriatrics-1.mp3","year":2020,"tier":6,"topic":"Geriatrics","acclaim":"H","summary":"A sweep of high-yield geriatrics — falls, ADLs, pressure ulcers, incontinence, and distinguishing normal aging from pathology (delirium vs dementia).","why":"A growing slice of the blueprint; pairs naturally with the military episodes.","old":true},{"ep":132,"title":"Floridly HY Social Sciences Review","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2019/08/episode-132-social-sciences.mp3","year":2019,"tier":6,"topic":"Behavioral","acclaim":"W","summary":"Targets the 'bizarro' behavioral and social-science questions — plus a fast pass over palliative/QI/HIPAA/advance directives and a quick vaccine/screening run-through.","why":"Easy points on the non-classical concepts most resources skip.","old":true},{"ep":337,"title":"Drug Ad Questions","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2021/08/episode-337-drug-ads.mp3","year":2021,"tier":7,"topic":"Test Strategy","acclaim":"W","summary":"Specific tips and tricks for reading the notoriously time-consuming drug-advertisement questions quickly and accurately.","why":"Time management and trap-avoidance for the multi-part drug-ad blocks.","old":true},{"ep":400,"title":"Get Your Head in the Game","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2022/07/episode-400-get-your-head-in-the-game.mp3","year":2022,"tier":7,"topic":"Psychology","acclaim":"U","summary":"The psychology of test day: stamina across a 9-hour exam, managing the panic of experimental questions, and recovering composure mid-block.","why":"Near-universally cited as the listen for the 24–48 hours before — even the drive to the center.","old":false},{"ep":518,"title":"2024 Step 2CK Free 120 — Part 1","url":"https://divineinterventionpodcasts.com/wp-content/uploads/2024/03/episode-518-step-2-free-120-2024-part-1.mp3","year":2024,"tier":8,"topic":"Free 120","acclaim":"U","summary":"Opens the question-by-question walkthrough of the 2024 Step 2 CK Free 120, deliberately long up front to lay out the test-taking principles, then deconstructs the stems.","why":"Final-week gold — but do the blocks timed first, then listen. Series continues (519, 520…).","old":false}]};
+const BASEEPS=DATA.episodes,TIERS=DATA.tiers,ACC=DATA.acclaim;
+const audio=document.getElementById('audio');
+const LS='dipdilemma_v3';
+let S={done:{},pos:{},rate:1,lastEp:null,custom:[],skin:'warm',mode:'dark',tab:'core'};
+try{const r=localStorage.getItem(LS);if(r)S=Object.assign(S,JSON.parse(r));}catch(e){}
+applyTheme();
+function applyTheme(){document.documentElement.dataset.skin=S.skin;document.documentElement.dataset.mode=S.mode;
+  const dark=S.mode==='dark';const tc=S.skin==='warm'?(dark?'#16130f':'#f2e9d8'):(dark?'#0d0f14':'#f4f2ee');
+  const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',tc);}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
+
+let EPS=[];let cur=-1;
+const RATES=[1,1.2,1.5,1.75,2,0.85];let rateI=Math.max(0,RATES.indexOf(S.rate));if(rateI<0)rateI=0;
+const SLEEPS=[0,15,30,45,60];let sleepI=0,sleepTimer=null;
+function allEps(){return BASEEPS.concat(S.custom||[]);}
+function fmt(s){if(!isFinite(s)||s<0)s=0;const m=Math.floor(s/60),x=Math.floor(s%60);return m+':'+(x<10?'0':'')+x;}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2200);}
+function key(e){return e.custom?'c'+e.ep:e.ep;}
+function accPill(a){const x=ACC[a];const st=a==='U'?'\u2605\u2605\u2605':a==='W'?'\u2605\u2605':'\u2726';return `<span class="pill ${a.toLowerCase()}"><span class="star">${st}</span>${x.label}</span>`;}
+
+function renderList(){
+  EPS=allEps();const w=document.getElementById('listWrap');
+  const doneCount=Object.keys(S.done).filter(k=>S.done[k]).length;
+  let h=`<div class="intro">
+    <div class="logo"></div><h1>DIP Dilemma</h1>
+    <div class="tag">The Divine Intervention Step 2 CK curriculum</div>
+    <p>38 verified episodes, sequenced by consensus. Press play and let it run \u2014 each finished episode flows into the next. No deciding.</p>
+    <div class="stats">
+      <div class="stat"><b>${BASEEPS.length}</b><span>CORE</span></div>
+      <div class="stat"><b>${doneCount}</b><span>DONE</span></div>
+      <div class="stat"><b>${(S.custom||[]).length}</b><span>LIBRARY</span></div>
+    </div>
+    <div class="cta"><button class="start" id="startBtn">\u25b6 ${S.lastEp!=null?'Resume':'Start'}</button>${S.lastEp!=null?'<button class="start alt" id="topBtn">\u21ba From top</button>':''}</div>
+    <button class="reset" id="resetBtn">Reset progress</button>
+  </div>`;
+  h+=`<div class="section-tab"><button id="tabCore" class="${S.tab==='core'?'on':''}">Core Block \u00b7 38</button><button id="tabLib" class="${S.tab==='lib'?'on':''}">My Library \u00b7 ${(S.custom||[]).length}</button></div>`;
+  if(S.tab==='core'){
+    const byTier={};EPS.forEach((e,i)=>{if(!e.custom)(byTier[e.tier]=byTier[e.tier]||[]).push(i);});
+    Object.keys(TIERS).map(Number).sort((a,b)=>a-b).forEach(t=>{const T=TIERS[t];
+      h+=`<div class="tier"><div class="tier-head"><div class="tier-name"><span class="n">${String(t).padStart(2,'0')}</span>${T.name}</div><div class="tier-desc">${T.desc}</div></div>`;
+      (byTier[t]||[]).forEach(i=>h+=epRow(i));h+=`</div>`;});
+  }else{
+    const lib=[];EPS.forEach((e,i)=>{if(e.custom)lib.push(i);});
+    if(lib.length===0)h+=`<div class="empty-lib">Your library is empty.<br>Add rescue episodes below \u2014 after a weak block, not just in case.</div>`;
+    else{h+=`<div class="tier">`;lib.forEach(i=>h+=epRow(i));h+=`</div>`;}
+    h+=`<div class="addbox"><h3>\uff0b Add to library</h3>
+      <p>Find the episode on the site, long-press its audio to copy the .mp3 link, paste it here so it plays. Number + label alone files it with a link to find it later.</p>
+      <div class="addrow"><input class="num" id="addNum" inputmode="numeric" placeholder="No."><input id="addTitle" placeholder="Label \u2014 e.g. Thyroid"></div>
+      <div class="addrow"><input id="addUrl" placeholder="Paste .mp3 link (recommended)"></div>
+      <div class="addrow"><button id="addBtn" style="flex:1">Add episode</button></div></div>`;
+  }
+  h+=`<div class="tools"><h3>Companion resources</h3>
+    <p>\u2022 Written notes: <a href="https://divineinterventionpodcasts.com/notes/" target="_blank" rel="noopener">divineinterventionpodcasts.com/notes</a></p>
+    <p>\u2022 Topic matrix: <a href="https://divineinterventionpodcasts.com/exam-topic-lists/" target="_blank" rel="noopener">Exam Topic Lists</a></p>
+    <p class="warn">\u2022 The \u24d8 on older episodes flags possible guideline drift \u2014 verify specifics against current UWorld.</p></div>`;
+  h+=`<div class="appearance"><button id="skinBtn">appearance: ${S.skin}</button></div>`;
+  w.innerHTML=h;
+
+  document.getElementById('startBtn').onclick=()=>{if(S.lastEp!=null){const idx=EPS.findIndex(e=>key(e)===S.lastEp);play(idx>=0?idx:0);}else play(0);};
+  const tb=document.getElementById('topBtn');if(tb)tb.onclick=()=>play(0);
+  document.getElementById('resetBtn').onclick=()=>{if(confirm('Reset all progress and library?')){S={done:{},pos:{},rate:1,lastEp:null,custom:[],skin:S.skin,mode:S.mode,tab:'core'};save();cur=-1;audio.pause();audio.removeAttribute('src');renderNP();renderList();}};
+  document.getElementById('tabCore').onclick=()=>{S.tab='core';save();renderList();};
+  document.getElementById('tabLib').onclick=()=>{S.tab='lib';save();renderList();};
+  const ab=document.getElementById('addBtn');if(ab)ab.onclick=addEpisode;
+  document.getElementById('skinBtn').onclick=()=>{S.skin=S.skin==='warm'?'cool':'warm';applyTheme();save();renderNP();renderList();toast(S.skin==='warm'?'Reading Room':'Focus mode');};
+  w.querySelectorAll('.ep').forEach(el=>el.onclick=ev=>{if(ev.target.dataset.del!=null){ev.stopPropagation();removeCustom(+ev.target.dataset.del);return;}play(+el.dataset.i);});
+  paintList();
+}
+function epRow(i){const e=EPS[i];
+  const acc=e.acclaim?`<span class="ep-acc ${e.acclaim.toLowerCase()}">${ACC[e.acclaim].label}</span><span>\u00b7</span>`:'';
+  return `<div class="ep ${e.custom?'custom':''}" data-i="${i}" id="ep${i}"><div class="ep-num">${e.ep}</div>
+    <div class="ep-body"><div class="ep-title">${e.title.replace(/^Ep \d+ \u2014 /,'')}</div>
+    <div class="ep-sub">${acc}<span>${e.topic||'Added'}</span>${e.year?'<span>\u00b7</span><span>'+e.year+'</span>':''}</div></div>
+    <div class="ep-state">${e.custom?`<span class="ep-del" data-del="${i}">\u00d7</span>`:''}</div></div>`;
+}
+function paintList(){
+  document.querySelectorAll('.ep').forEach(el=>{const i=+el.dataset.i,e=EPS[i];if(!e)return;const k=key(e);
+    el.classList.toggle('active',i===cur);el.classList.toggle('done',!!S.done[k]&&i!==cur);
+    const st=el.querySelector('.ep-state');let mark='';
+    if(i===cur)mark=`<div class="eq ${audio.paused?'paused':''}"><span></span><span></span><span></span></div>`;
+    else if(S.done[k])mark=`<svg class="check" width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    st.innerHTML=mark+(e.custom?`<span class="ep-del" data-del="${i}">\u00d7</span>`:'');
+    const nd=st.querySelector('.ep-del');if(nd)nd.onclick=ev=>{ev.stopPropagation();removeCustom(i);};});
+}
+function addEpisode(){
+  const n=parseInt(document.getElementById('addNum').value,10);const lbl=document.getElementById('addTitle').value.trim();let url=document.getElementById('addUrl').value.trim();
+  if(!n||n<1||n>999){toast('Enter a valid episode number');return;}
+  if(allEps().some(e=>e.ep===n)){toast('Episode '+n+' already in your list');return;}
+  if(url&&!/^https?:\/\/.+\.mp3/i.test(url)){toast('That doesn\u2019t look like an .mp3 link');return;}
+  S.custom.push({ep:n,title:lbl?('Ep '+n+' \u2014 '+lbl):('Episode '+n),topic:'Added',year:'',custom:true,page:'https://divineinterventionpodcasts.com/?s='+n,url:url||null});
+  save();renderList();toast(url?('Added episode '+n):('Filed '+n+' \u2014 paste a link to play'));
+}
+function removeCustom(i){const e=EPS[i];if(!e||!e.custom)return;S.custom=S.custom.filter(c=>c.ep!==e.ep);delete S.done['c'+e.ep];delete S.pos['c'+e.ep];if(key(e)===S.lastEp)S.lastEp=null;save();if(cur===i){audio.pause();cur=-1;renderNP();}renderList();}
+
+function renderNP(){
+  const shell=document.getElementById('npShell');
+  if(cur<0){shell.innerHTML=`<div class="np empty"><div class="topbar"><div class="brand"><span class="mk"></span>DIP Dilemma</div><button class="modebtn" id="modeBtn0">${modeIcon()}</button></div></div>`;
+    const b=document.getElementById('modeBtn0');if(b)b.onclick=toggleMode;return;}
+  const e=EPS[cur],idx=cur+1;
+  shell.innerHTML=`<div class="np">
+    <div class="topbar"><div class="brand"><span class="mk"></span>DIP Dilemma</div><button class="modebtn" id="modeBtn">${modeIcon()}</button></div>
+    <div class="np-kicker"><span>Now Playing</span><span class="prog">${idx} / ${EPS.length}</span></div>
+    <div class="np-title"><span class="e">Ep ${e.ep}</span> \u00b7 ${e.title.replace(/^Ep \d+ \u2014 /,'')}</div>
+    <div class="np-row">${e.acclaim?accPill(e.acclaim):''}<span class="np-topic">${e.topic||'Added'}</span>${e.year?'<span>\u00b7</span><span>'+e.year+'</span>':''}${e.old?'<span class="iwarn" id="iwarn">i</span>':''}</div>
+    ${e.summary?`<div class="np-summary">${e.summary}</div>`:''}
+    ${e.custom?`<div class="np-summary">Added by you.${e.url?'':' No audio link yet \u2014 open <a href="'+e.page+'" target="_blank" style="color:var(--w)">the site</a> to grab the .mp3.'}</div>`:''}
+    ${e.old?`<div class="np-warnbox" id="warnbox">Recorded ${e.year}. Guidelines and drug choices may have shifted \u2014 verify specifics against current UWorld before trusting them on test day.</div>`:''}
+  </div>
+  <div class="controls">
+    <div class="scrub"><span class="time" id="tCur">0:00</span><div class="bar" id="bar"><div class="bar-fill" id="barFill"></div><div class="bar-knob" id="barKnob"></div></div><span class="time r" id="tDur">--:--</span></div>
+    <div class="btns">
+      <button class="btn sm" id="rateBtn"><span class="rate-val" id="rateVal">1\u00d7</span></button>
+      <button class="btn sm" id="prevBtn"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M7 6v12M19 6l-9 6 9 6V6z"/></svg></button>
+      <button class="btn sm" id="b15"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4 7 8l4 4"/><path d="M7 8h7a5 5 0 0 1 5 5 5 5 0 0 1-5 5H9"/></svg><span class="lbl">15</span></button>
+      <button class="btn play" id="playBtn"></button>
+      <button class="btn sm" id="f15"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4l4 4-4 4"/><path d="M17 8h-7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h5"/></svg><span class="lbl">15</span></button>
+      <button class="btn sm" id="nextBtn"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17 6v12M5 6l9 6-9 6V6z"/></svg></button>
+    </div>
+    <div class="subrow"><button class="chip" id="sleepChip">\u263e Sleep timer</button></div>
+  </div>`;
+  document.getElementById('modeBtn').onclick=toggleMode;
+  document.getElementById('playBtn').onclick=togglePlay;
+  document.getElementById('prevBtn').onclick=()=>play(Math.max(0,cur-1));
+  document.getElementById('nextBtn').onclick=()=>play(Math.min(EPS.length-1,cur+1));
+  document.getElementById('b15').onclick=()=>{audio.currentTime=Math.max(0,audio.currentTime-15)};
+  document.getElementById('f15').onclick=()=>{audio.currentTime=Math.min(audio.duration||1e9,audio.currentTime+15)};
+  document.getElementById('rateBtn').onclick=cycleRate;
+  document.getElementById('sleepChip').onclick=cycleSleep;
+  const iw=document.getElementById('iwarn');if(iw)iw.onclick=()=>document.getElementById('warnbox').classList.toggle('on');
+  const bar=document.getElementById('bar');
+  const seek=ev=>{const r=bar.getBoundingClientRect();const cx=ev.touches?ev.touches[0].clientX:ev.clientX;const x=(cx-r.left)/r.width;if(audio.duration)audio.currentTime=Math.max(0,Math.min(1,x))*audio.duration;};
+  bar.addEventListener('click',seek);let drag=false;
+  bar.addEventListener('touchstart',e=>{drag=true;seek(e);},{passive:true});
+  bar.addEventListener('touchmove',e=>{if(drag)seek(e);},{passive:true});
+  bar.addEventListener('touchend',()=>drag=false);
+  paintPlayBtn();paintRate();paintSleep();
+}
+function modeIcon(){return S.mode==='dark'
+  ?'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19" stroke-linecap="round"/></svg>'
+  :'<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';}
+function toggleMode(){S.mode=S.mode==='dark'?'light':'dark';applyTheme();save();renderNP();}
+function paintPlayBtn(){const b=document.getElementById('playBtn');if(!b)return;b.innerHTML=audio.paused?'<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5v14l12-7L7 5z"/></svg>':'<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';}
+function cycleRate(){rateI=(rateI+1)%RATES.length;audio.playbackRate=RATES[rateI];S.rate=RATES[rateI];save();paintRate();}
+function paintRate(){const v=document.getElementById('rateVal');if(v)v.textContent=RATES[rateI]+'\u00d7';}
+function cycleSleep(){sleepI=(sleepI+1)%SLEEPS.length;const m=SLEEPS[sleepI];if(sleepTimer){clearTimeout(sleepTimer);sleepTimer=null;}if(m>0){sleepTimer=setTimeout(()=>{audio.pause();toast('Sleep timer \u2014 paused');sleepI=0;paintSleep();},m*60000);toast('Sleep in '+m+' min');}else toast('Sleep timer off');paintSleep();}
+function paintSleep(){const c=document.getElementById('sleepChip');if(!c)return;const m=SLEEPS[sleepI];c.classList.toggle('on',m>0);c.innerHTML=m>0?('\u263e '+m+' min'):'\u263e Sleep timer';}
+function play(i){if(i<0||i>=EPS.length)return;if(i===cur){togglePlay();return;}
+  if(cur>=0&&audio.currentTime>5)S.pos[key(EPS[cur])]=audio.currentTime;
+  cur=i;const e=EPS[i];
+  if(e.custom&&!e.url){toast('No audio link for Ep '+e.ep+' yet');S.lastEp=key(e);save();renderNP();paintList();return;}
+  audio.src=e.url;audio.playbackRate=RATES[rateI];const k=key(e);if(S.pos[k]){try{audio.currentTime=S.pos[k];}catch(x){}}
+  audio.play().catch(()=>toast('Could not load audio'));S.lastEp=k;save();renderNP();paintList();
+  const el=document.getElementById('ep'+i);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});}
+function togglePlay(){if(!audio.src)return;if(audio.paused)audio.play();else audio.pause();}
+let saveTick=0;
+audio.addEventListener('timeupdate',()=>{const f=document.getElementById('barFill'),k=document.getElementById('barKnob'),tc=document.getElementById('tCur'),td=document.getElementById('tDur');
+  if(f){const p=audio.duration?audio.currentTime/audio.duration*100:0;f.style.width=p+'%';if(k)k.style.left=p+'%';if(tc)tc.textContent=fmt(audio.currentTime);if(td)td.textContent=audio.duration?fmt(audio.duration):'--:--';}
+  if(cur>=0){S.pos[key(EPS[cur])]=audio.currentTime;if(Date.now()-saveTick>4000){saveTick=Date.now();save();}}});
+audio.addEventListener('play',()=>{paintPlayBtn();paintList();setMS();});
+audio.addEventListener('pause',()=>{paintPlayBtn();paintList();save();});
+audio.addEventListener('ended',()=>{if(cur>=0){S.done[key(EPS[cur])]=true;S.pos[key(EPS[cur])]=0;save();}if(cur<EPS.length-1)play(cur+1);else{paintList();toast('Curriculum complete \ud83c\udf93');}});
+function setMS(){if(!('mediaSession'in navigator)||cur<0)return;const e=EPS[cur];
+  navigator.mediaSession.metadata=new MediaMetadata({title:'Ep '+e.ep+' \u00b7 '+e.title.replace(/^Ep \d+ \u2014 /,''),artist:'DIP Dilemma \u00b7 '+(e.topic||''),album:'Step 2 CK'});
+  navigator.mediaSession.setActionHandler('play',()=>audio.play());navigator.mediaSession.setActionHandler('pause',()=>audio.pause());
+  navigator.mediaSession.setActionHandler('previoustrack',()=>play(Math.max(0,cur-1)));navigator.mediaSession.setActionHandler('nexttrack',()=>play(Math.min(EPS.length-1,cur+1)));
+  navigator.mediaSession.setActionHandler('seekbackward',()=>{audio.currentTime=Math.max(0,audio.currentTime-15)});navigator.mediaSession.setActionHandler('seekforward',()=>{audio.currentTime=Math.min(audio.duration||1e9,audio.currentTime+15)});}
+window.addEventListener('beforeunload',save);
+if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+renderNP();renderList();
+</script>
+</body>
+</html>
