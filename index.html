@@ -65,8 +65,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font-body);font-size
 .np.empty{background:transparent;border-bottom:none;padding-bottom:0}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .brand{font-family:var(--font-display);font-weight:600;font-size:16px;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
-.brand .mk{width:19px;height:19px;border:2px solid var(--acc);border-radius:5px;transform:rotate(45deg);position:relative}
-.brand .mk::after{content:"";position:absolute;inset:3px;background:var(--acc);border-radius:1px;opacity:.5}
+.brand .mk{width:26px;height:26px;border-radius:7px;object-fit:cover;display:block}
 .modebtn{background:var(--surf2);border:1px solid var(--line2);color:var(--tx-dim);width:34px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
 .modebtn:hover{color:var(--acc);border-color:var(--acc)}
 .np-kicker{font-family:var(--font-display);font-weight:600;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);margin-bottom:8px;display:flex;justify-content:space-between;gap:10px}
@@ -112,8 +111,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font-body);font-size
 .list-wrap::-webkit-scrollbar{width:6px}.list-wrap::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px}
 
 .intro{padding:28px 20px 10px;text-align:center}
-.intro .logo{width:50px;height:50px;border:3px solid var(--acc);border-radius:14px;transform:rotate(45deg);margin:0 auto 20px;position:relative}
-.intro .logo::after{content:"";position:absolute;inset:8px;background:var(--acc);border-radius:3px;opacity:.55}
+.intro .logo{width:96px;height:96px;border-radius:22px;object-fit:cover;display:block;margin:0 auto 20px;box-shadow:0 8px 30px color-mix(in srgb,var(--acc) 28%,transparent)}
 .intro h1{font-family:var(--font-display);font-weight:900;font-size:32px;letter-spacing:-.02em}
 .intro .tag{font-size:15px;color:var(--tx-dim);margin-top:6px}
 :root[data-skin="warm"] .intro .tag{font-style:italic}
@@ -214,7 +212,7 @@ function renderList(){
   EPS=allEps();const w=document.getElementById('listWrap');
   const doneCount=Object.keys(S.done).filter(k=>S.done[k]).length;
   let h=`<div class="intro">
-    <div class="logo"></div><h1>DIP Dilemma</h1>
+    <img class="logo" src="icon-512.png" alt="DIP Dilemma"><h1>DIP Dilemma</h1>
     <div class="tag">The Divine Intervention Step 2 CK curriculum</div>
     <p>38 verified episodes, sequenced by consensus. Press play and let it run \u2014 each finished episode flows into the next. No deciding.</p>
     <div class="stats">
@@ -286,11 +284,11 @@ function removeCustom(i){const e=EPS[i];if(!e||!e.custom)return;S.custom=S.custo
 
 function renderNP(){
   const shell=document.getElementById('npShell');
-  if(cur<0){shell.innerHTML=`<div class="np empty"><div class="topbar"><div class="brand"><span class="mk"></span>DIP Dilemma</div><button class="modebtn" id="modeBtn0">${modeIcon()}</button></div></div>`;
+  if(cur<0){shell.innerHTML=`<div class="np empty"><div class="topbar"><div class="brand"><img class="mk" src="icon-512.png" alt="">DIP Dilemma</div><button class="modebtn" id="modeBtn0">${modeIcon()}</button></div></div>`;
     const b=document.getElementById('modeBtn0');if(b)b.onclick=toggleMode;return;}
   const e=EPS[cur],idx=cur+1;
   shell.innerHTML=`<div class="np">
-    <div class="topbar"><div class="brand"><span class="mk"></span>DIP Dilemma</div><button class="modebtn" id="modeBtn">${modeIcon()}</button></div>
+    <div class="topbar"><div class="brand"><img class="mk" src="icon-512.png" alt="">DIP Dilemma</div><button class="modebtn" id="modeBtn">${modeIcon()}</button></div>
     <div class="np-kicker"><span>Now Playing</span><span class="prog">${idx} / ${EPS.length}</span></div>
     <div class="np-title"><span class="e">Ep ${e.ep}</span> \u00b7 ${e.title.replace(/^Ep \d+ \u2014 /,'')}</div>
     <div class="np-row">${e.acclaim?accPill(e.acclaim):''}<span class="np-topic">${e.topic||'Added'}</span>${e.year?'<span>\u00b7</span><span>'+e.year+'</span>':''}${e.old?'<span class="iwarn" id="iwarn">i</span>':''}</div>
